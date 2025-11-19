@@ -86,7 +86,10 @@ WHERE rank = 1;
 ```sql
 SELECT * 
 FROM netflix
-WHERE release_year = 2020;
+WHERE 
+	type = 'Movie'
+	AND 
+	release_year = 2020;
 ```
 
 **Objective:** Retrieve all movies released in a specific year.
@@ -94,16 +97,15 @@ WHERE release_year = 2020;
 ### 4. Find the Top 5 Countries with the Most Content on Netflix
 
 ```sql
-SELECT * 
-FROM
-(
-    SELECT 
-        UNNEST(STRING_TO_ARRAY(country, ',')) AS country,
-        COUNT(*) AS total_content
+SELECT 
+    TRIM(country) AS country,
+    COUNT(*) AS total_content
+FROM (
+    SELECT UNNEST(STRING_TO_ARRAY(country, ',')) AS country
     FROM netflix
-    GROUP BY 1
-) AS t1
-WHERE country IS NOT NULL
+) AS split_countries
+WHERE country IS NOT NULL AND country <> ''
+GROUP BY country
 ORDER BY total_content DESC
 LIMIT 5;
 ```
@@ -113,8 +115,7 @@ LIMIT 5;
 ### 5. Identify the Longest Movie
 
 ```sql
-SELECT 
-    *
+SELECT *
 FROM netflix
 WHERE type = 'Movie'
 ORDER BY SPLIT_PART(duration, ' ', 1)::INT DESC;
@@ -136,13 +137,8 @@ WHERE TO_DATE(date_added, 'Month DD, YYYY') >= CURRENT_DATE - INTERVAL '5 years'
 
 ```sql
 SELECT *
-FROM (
-    SELECT 
-        *,
-        UNNEST(STRING_TO_ARRAY(director, ',')) AS director_name
-    FROM netflix
-) AS t
-WHERE director_name = 'Rajiv Chilaka';
+FROM netflix
+WHERE director LIKE '%Rajiv Chilaka%';
 ```
 
 **Objective:** List all content directed by 'Rajiv Chilaka'.
