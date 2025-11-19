@@ -1,1 +1,2 @@
-# Netflix-Data-Analysis-Using-SQL
+# Netflix Movies and TV Shows Analysis using SQL
+
